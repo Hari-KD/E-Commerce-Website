@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Success — Nehaa Gallerina{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div style="max-width: 800px; margin: 4rem auto; text-align: center;">
+    <div style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h1>Order Placed Successfully!</h1>
+    <p style="font-size: 1.2rem; margin: 2rem 0;">Thank you for your purchase!</p>
+    
+    <div style="background: #f9f9f9; padding: 2rem; border-radius: 8px; margin: 2rem 0; color: #333;">
+      <h3 style="color: #333;">Order Details</h3>
+      <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+      <p><strong>Total Amount:</strong> ${{ order.total_price }}</p>
+      <p><strong>Status:</strong> {{ order.order_status }}</p>
+      <p><strong>Email:</strong> {{ order.email }}</p>
+    </div>
+    
+    <p>A confirmation email has been sent to {{ order.email }}</p>
+    
+    <div style="margin-top: 2rem;">
+      <a href="{% url 'store:shop' %}" class="btn magnetic">Continue Shopping</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'users:order_history' %}" class="btn magnetic" style="margin-left: 1rem;">View Orders</a>
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}

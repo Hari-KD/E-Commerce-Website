@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout — Nehaa Gallerina{% endblock %}
+
+{% block extra_css %}
+<style>
+  .checkout-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .checkout-header {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .checkout-form {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #000;
+    background: #f5f5f5;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .order-summary {
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    align-self: start;
+    position: sticky;
+    top: 1rem;
+    color: #333;
+  }
+
+  .order-summary h3 {
+    margin-top: 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+  }
+
+  .order-items {
+    margin: 1rem 0;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
+    color: #333;
+  }
+
+  .order-total {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #333;
+  }
+
+  .btn-pay {
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .checkout-container {
+      grid-template-columns: 1fr;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="checkout-container">
+    <div class="checkout-header">
+      <h1>Checkout</h1>
+      <p>Complete your order</p>
+    </div>
+
+    <div class="checkout-form">
+      <h3>Shipping Information</h3>
+      <form method="POST" id="checkoutForm">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first_name">First Name *</label>
+            <input type="text" class="form-control" id="first_name" name="first_name"
+              value="{% if user.is_authenticated %}{{ user.first_name }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="last_name">Last Name *</label>
+            <input type="text" class="form-control" id="last_name" name="last_name"
+              value="{% if user.is_authenticated %}{{ user.last_name }}{% endif %}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" class="form-control" id="email" name="email"
+            value="{% if user.is_authenticated %}{{ user.email }}{% endif %}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone *</label>
+          <input type="tel" class="form-control" id="phone" name="phone"
+            value="{% if user.is_authenticated %}{{ user.phone_number }}{% endif %}" required>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address *</label>
+          <textarea class="form-control" id="address" name="address" rows="3"
+            required>{% if user.is_authenticated %}{{ user.address }}{% endif %}</textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input type="text" class="form-control" id="city" name="city"
+              value="{% if user.is_authenticated %}{{ user.city }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="state">State *</label>
+            <input type="text" class="form-control" id="state" name="state"
+              value="{% if user.is_authenticated %}{{ user.state }}{% endif %}" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pincode">Pincode *</label>
+            <input type="text" class="form-control" id="pincode" name="pincode"
+              value="{% if user.is_authenticated %}{{ user.pincode }}{% endif %}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country *</label>
+            <input type="text" class="form-control" id="country" name="country"
+              value="{% if user.is_authenticated %}{{ user.country }}{% else %}India{% endif %}" required>
+          </div>
+        </div>
+
+        <input type="hidden" name="payment_id" id="payment_id">
+        <div id="paypal-button-container" style="margin-top: 1.5rem; width: 100%;"></div>
+      </form>
+    </div>
+
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div class="order-items">
+        {% for item in cart_items %}
+        <div class="order-item">
+          <div>
+            <strong>{{ item.product.name }}</strong><br>
+            <small>Qty: {{ item.quantity }}</small>
+          </div>
+          <div>${{ item.sub_total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="order-total">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Total:</span>
+          <span>${{ total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<!-- PayPal JS SDK (Sandbox/Test Mode) -->
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+<script>
+  const form = document.getElementById('checkoutForm');
+  const total = {{ total }};
+
+  // Render PayPal Buttons
+  paypal.Buttons({
+    // Form Validation hook before creating order
+    onClick: function(data, actions) {
+      if (!form.checkValidity()) {
+        form.reportValidity(); // This triggers the browser's built-in popup warnings!
+        return actions.reject(); // Prevent PayPal window from opening
+      }
+      return actions.resolve();
+    },
+
+    // Create the order
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: total.toString()
+          }
+        }]
+      });
+    },
+
+    // Handle successful payment
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        // Save the PayPal transaction ID and submit the form
+        document.getElementById('payment_id').value = details.id;
+        form.submit();
+      });
+    },
+
+    // Handle errors
+    onError: function(err) {
+      console.error('PayPal Error:', err);
+      alert('There was an issue loading PayPal. Please try again.');
+    }
+  }).render('#paypal-button-container');
+
+  // Add form validation feedback (Red border on invalid, without suppressing the tooltip)
+  document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('invalid', function (e) {
+      // e.preventDefault() was removed so the browser's helpful tooltip still shows!
+      this.style.borderColor = '#ef4444';
+    });
+
+    input.addEventListener('input', function () {
+      if (this.validity.valid) {
+        this.style.borderColor = '#ddd';
+      }
+    });
+  });
+</script>
+{% endblock %}

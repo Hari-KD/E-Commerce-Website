@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — Nehaa Gallerina{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="product-detail-layout reveal">
+    <div class="product-image-gallery">
+      <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+    </div>
+    <div class="product-info">
+      <h1>{{ product.name }}</h1>
+      <div class="price">${{ product.price }}</div>
+      <p class="description">{{ product.description }}</p>
+      
+      {% if product.product_type or product.origin or product.size or product.treatment %}
+      <ul class="product-specs">
+        {% if product.product_type %}<li><span>Type:</span> {{ product.product_type }}</li>{% endif %}
+        {% if product.origin %}<li><span>Origin:</span> {{ product.origin }}</li>{% endif %}
+        {% if product.size %}<li><span>Size:</span> {{ product.size }}</li>{% endif %}
+        {% if product.treatment %}<li><span>Treatment:</span> {{ product.treatment }}</li>{% endif %}
+      </ul>
+      {% endif %}
+      
+      {% if product.is_in_stock %}
+        <button class="btn magnetic add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+        <p class="stock-info">In Stock: {{ product.stock }} available</p>
+      {% else %}
+        <button class="btn" disabled>Out of Stock</button>
+      {% endif %}
+    </div>
+  </div>
+  
+  {% if related_products %}
+  <section class="reveal" style="margin-top: 4rem;">
+    <h2 class="section-title">Related Products</h2>
+    <div class="grid">
+      {% for related in related_products %}
+      <article class="product">
+        <div class="product-image"><img src="{{ related.get_image_url }}" alt="{{ related.name }}"></div>
+        <div class="meta">
+          <h3>{{ related.name }}</h3>
+          <div class="price">${{ related.price }}</div>
+        </div>
+        <a href="{% url 'store:product_detail' related.slug %}" class="product-link">View Details</a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+
+<style>
+.stock-info {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Get CSRF token from cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+document.addEventListener('DOMContentLoaded', function() {
+  const addToCartBtn = document.querySelector('.add-to-cart-btn');
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const productId = this.dataset.productId;
+      const button = this;
+      
+      // Disable button to prevent double clicks
+      button.disabled = true;
+      button.textContent = 'Adding...';
+      
+      const formData = new FormData();
+      formData.append('quantity', '1');
+      
+      fetch(`/api/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update cart count
+          const cartCount = document.getElementById('django-cart-count');
+          if (cartCount) {
+            cartCount.textContent = data.cart_count;
+            cartCount.style.display = 'flex';
+          }
+          
+          // Show notification
+          showNotification(data.message || 'Product added to cart!', 'success');
+          
+          // Re-enable button
+          button.disabled = false;
+          button.textContent = 'Add to Cart';
+        } else {
+          showNotification(data.error || 'Error adding to cart', 'error');
+          button.disabled = false;
+          button.textContent = 'Add to Cart';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding to cart. Please try again.', 'error');
+        button.disabled = false;
+        button.textContent = 'Add to Cart';
+      });
+    });
+  }
+});
+
+function showNotification(message, type = 'info') {
+  // Remove existing notifications
+  const existing = document.querySelectorAll('.cart-notification');
+  existing.forEach(el => el.remove());
+  
+  const notification = document.createElement('div');
+  notification.className = 'cart-notification';
+  notification.style.cssText = `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : '#ef4444'};
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+  `;
+  
+  notification.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Trigger animation
+  setTimeout(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateX(0)';
+  }, 10);
+  
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(400px)';
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+</script>
+{% endblock %}

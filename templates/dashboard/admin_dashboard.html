@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard — Nehaa Gallerina{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .admin-section {
+    padding: 2rem 0;
+  }
+  
+  .dashboard-header {
+    margin-bottom: 3rem;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--accent);
+    margin: 1rem 0;
+  }
+  
+  .stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .chart-container {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  
+  .chart-container h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .chart-container canvas {
+    max-height: 300px;
+  }
+  
+  .orders-table {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+  
+  .orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .orders-table th,
+  .orders-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .orders-table th {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  
+  .status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .status.completed {
+    background: #10b981;
+    color: #fff;
+  }
+  
+  .status.processing {
+    background: #3b82f6;
+    color: #fff;
+  }
+  
+  .status.pending {
+    background: #f59e0b;
+    color: #fff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container admin-section">
+  <div class="dashboard-header reveal">
+    <h1>Admin Dashboard</h1>
+    <p style="color: var(--text-secondary); font-size: 18px;">Manage your e-commerce platform</p>
+  </div>
+
+  <section class="stats-grid reveal">
+    <div class="stat-card">
+      <div class="stat-icon" style="font-size: 2.5rem; margin-bottom: 1rem;">📦</div>
+      <div class="stat-number">{{ total_orders }}</div>
+      <div class="stat-label">Total Orders</div>
+      <div style="color: #10b981; font-size: 12px; margin-top: 0.5rem;">+{{ orders_growth }}% from last month</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="font-size: 2.5rem; margin-bottom: 1rem;">💰</div>
+      <div class="stat-number">${{ total_sales|floatformat:2 }}</div>
+      <div class="stat-label">Total Sales</div>
+      <div style="color: #10b981; font-size: 12px; margin-top: 0.5rem;">+{{ sales_growth }}% from last month</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="font-size: 2.5rem; margin-bottom: 1rem;">💵</div>
+      <div class="stat-number">${{ revenue|floatformat:2 }}</div>
+      <div class="stat-label">Revenue</div>
+      <div style="color: #10b981; font-size: 12px; margin-top: 0.5rem;">+15% from last month</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+      <div class="stat-number">${{ monthly_target }}</div>
+      <div class="stat-label">Monthly Target</div>
+      <div style="color: var(--text-secondary); font-size: 12px; margin-top: 0.5rem;">{{ target_completion }}% completed</div>
+    </div>
+  </section>
+
+  <section class="dashboard-content reveal">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+      <div class="chart-container">
+        <h2>Sales Overview</h2>
+        <canvas id="salesChart"></canvas>
+      </div>
+      
+      <div class="chart-container">
+        <h2>Revenue Trend</h2>
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="orders-table reveal">
+      <h2 style="margin-bottom: 1.5rem;">Recent Orders</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+          <tr>
+            <td>{{ order.order_number }}</td>
+            <td>{{ order.get_customer_name }}</td>
+            <td>{{ order.items.count }}</td>
+            <td>${{ order.total_price }}</td>
+            <td><span class="status {{ order.order_status|lower }}">{{ order.order_status }}</span></td>
+            <td>{{ order.created_at|date:"M d, Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" style="text-align: center;">No orders yet</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize charts
+document.addEventListener('DOMContentLoaded', function() {
+  // Sales Chart
+  const salesCtx = document.getElementById('salesChart').getContext('2d');
+  new Chart(salesCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ chart_labels|safe }},
+      datasets: [{
+        label: 'Sales',
+        data: {{ sales_data|safe }},
+        backgroundColor: 'rgba(224, 184, 255, 0.5)',
+        borderColor: '#e0b8ff',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#a09db3' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#a09db3' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#f0f0f5' }
+        }
+      }
+    }
+  });
+
+  // Revenue Chart
+  const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels|safe }},
+      datasets: [{
+        label: 'Revenue',
+        data: {{ revenue_data|safe }},
+        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+        borderColor: '#10b981',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#a09db3' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        },
+        x: {
+          ticks: { color: '#a09db3' },
+          grid: { color: 'rgba(255, 255, 255, 0.1)' }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: { color: '#f0f0f5' }
+        }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

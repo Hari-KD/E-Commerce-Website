@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nehaa Gallerina — The Art of Gemstones{% endblock %}
+
+{% block content %}
+<main class="container">
+  <section class="hero">
+    <div class="hero-card">
+      <h1 class="animated-headline">
+        <span style="--i:1">R</span><span style="--i:2">a</span><span style="--i:3">r</span><span style="--i:4">e</span><span style="--i:5">&nbsp;</span><span style="--i:6">F</span><span style="--i:7">a</span><span style="--i:8">c</span><span style="--i:9">e</span><span style="--i:10">t</span><span style="--i:11">e</span><span style="--i:12">d</span><span style="--i:13">&nbsp;</span><span style="--i:14">G</span><span style="--i:15">e</span><span style="--i:16">m</span><span style="--i:17">s</span><span style="--i:18">t</span><span style="--i:19">o</span><span style="--i:20">n</span><span style="--i:21">e</span><span style="--i:22">s</span>
+      </h1>
+      <p class="reveal">Curated collection of hand-selected natural gemstones — strands, briolettes, beads and more. Perfect for jewelry designers and collectors.</p>
+      <a class="btn magnetic reveal" href="{% url 'store:shop' %}">Shop New Arrivals</a>
+    </div>
+  </section>
+  
+  <section class="reveal">
+    <div class="bento-grid">
+      <div class="bento-item">
+        <div class="icon">💎</div><h3>Hand-Selected Quality</h3><p>Meticulously chosen for exceptional cut, color, and clarity.</p>
+      </div>
+      <div class="bento-item">
+        <div class="icon">🌿</div><h3>Ethically Sourced</h3><p>Partnering with responsible suppliers to ensure integrity.</p>
+      </div>
+      <div class="bento-item tall">
+        <div class="icon">✨</div><h3>Unmatched Brilliance</h3><p>Our collection is curated to inspire with its spectacular play-of-color and light.</p>
+      </div>
+      <div class="bento-item wide">
+        <div class="icon">👩‍🎨</div><h3>For Creators, By Creators</h3><p>We understand the artist's needs, providing gems that elevate every design from simple to stunning.</p>
+      </div>
+    </div>
+  </section>
+  
+  <section class="reveal">
+    <h2 class="section-title">Featured Products</h2>
+    <div class="grid" id="product-grid">
+      {% for product in featured_products %}
+      <article class="product">
+        <div class="product-image"><img src="{{ product.get_image_url }}" alt="{{ product.name }}"></div>
+        <div class="meta">
+          <h3>{{ product.name }}</h3>
+          <div class="price">${{ product.price }}</div>
+        </div>
+        <a href="{% url 'store:product_detail' product.slug %}" class="product-link">View Details</a>
+      </article>
+      {% empty %}
+      <p>No featured products available at the moment.</p>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}

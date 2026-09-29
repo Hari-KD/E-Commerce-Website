@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register — Nehaa Gallerina{% endblock %}
+
+{% block content %}
+<main class="container">
+  <section class="login-section reveal" style="max-width: 500px; margin: 4rem auto;">
+    <div class="login-card" style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px;">
+      <div class="login-header">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem; text-align: center;">Create Account</h1>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Join us today</p>
+      </div>
+      
+      <form method="POST" class="login-form">
+        {% csrf_token %}
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="username" style="display: block; margin-bottom: 0.5rem;">Username</label>
+          <input type="text" id="username" name="username" required 
+                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="email" style="display: block; margin-bottom: 0.5rem;">Email</label>
+          <input type="email" id="email" name="email" required 
+                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="first_name" style="display: block; margin-bottom: 0.5rem;">First Name</label>
+            <input type="text" id="first_name" name="first_name" 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+          </div>
+          
+          <div class="form-group">
+            <label for="last_name" style="display: block; margin-bottom: 0.5rem;">Last Name</label>
+            <input type="text" id="last_name" name="last_name" 
+                   style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+          </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="password" style="display: block; margin-bottom: 0.5rem;">Password</label>
+          <input type="password" id="password" name="password" required 
+                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="password_confirm" style="display: block; margin-bottom: 0.5rem;">Confirm Password</label>
+          <input type="password" id="password_confirm" name="password_confirm" required 
+                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        </div>
+        
+        <button type="submit" class="btn magnetic" style="width: 100%; padding: 12px; font-size: 16px;">Register</button>
+      </form>
+      
+      <div style="margin-top: 2rem; text-align: center;">
+        <p>Already have an account? <a href="{% url 'users:login' %}" style="color: var(--accent);">Login here</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

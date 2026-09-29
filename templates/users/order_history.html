@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order History — Nehaa Gallerina{% endblock %}
+
+{% block content %}
+<main class="container">
+  <h1 class="page-title reveal">Order History</h1>
+  
+  {% if orders %}
+  <section class="reveal">
+    <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 8px;">
+      {% for order in orders %}
+      <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1.5rem 0;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+          <div>
+            <h3>Order {{ order.order_number }}</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">{{ order.created_at|date:"F d, Y" }}</p>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 1.2rem; font-weight: bold; color: var(--accent);">${{ order.total_price }}</div>
+            <div style="color: var(--text-secondary);">{{ order.order_status }}</div>
+          </div>
+        </div>
+        <div>
+          <strong>Items:</strong>
+          {% for item in order.items.all %}
+            {{ item.product.name }} (x{{ item.quantity }}){% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% else %}
+  <section class="reveal" style="text-align: center; padding: 4rem 0;">
+    <p>You haven't placed any orders yet.</p>
+    <a href="{% url 'store:shop' %}" class="btn magnetic" style="margin-top: 1rem;">Start Shopping</a>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}
