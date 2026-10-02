@@ -3,27 +3,56 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>{% block title %}Nehaa Gallerina — The Art of Gemstones{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="stylesheet" href="{% static 'style.css' %}?v=3">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
   <div class="cursor-dot"></div>
+  
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div class="mobile-nav-header">
+      <div class="mobile-logo-title">Nehaa Gallerina</div>
+      <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close Navigation"><i class="fas fa-times"></i></button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="{% url 'store:home' %}"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="{% url 'store:shop' %}"><i class="fas fa-gem"></i> Shop</a></li>
+      <li><a href="{% url 'store:gemstones' %}"><i class="fas fa-diamond"></i> Gemstones</a></li>
+      <li><a href="{% url 'store:about' %}"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="{% url 'store:contact' %}"><i class="fas fa-envelope"></i> Contact</a></li>
+      {% if user.is_authenticated %}
+        {% if user.is_staff %}
+          <li><a href="{% url 'dashboard:admin_dashboard' %}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+        {% else %}
+          <li><a href="{% url 'users:user_home' %}"><i class="fas fa-user-circle"></i> My Account</a></li>
+        {% endif %}
+        <li><a href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'users:login' %}"><i class="fas fa-user"></i> Login / Register</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
   <header>
     <div class="container topbar">
       <div class="logo magnetic">
-        <img src="https://thegemsfacet.com/wp-content/uploads/2023/01/gem-facet-logo.jpg" alt="logo">
-        <div>
-          <div style="font-weight:700; font-family: 'Playfair Display', serif;">Nehaa Gallerina</div>
-          <div style="font-size:12px;color:var(--text-secondary)">Natural & faceted gemstones</div>
-        </div>
+        <a href="{% url 'store:home' %}" style="display: flex; align-items: center; text-decoration: none; color: inherit; gap: 12px;">
+          <img src="https://thegemsfacet.com/wp-content/uploads/2023/01/gem-facet-logo.jpg" alt="logo">
+          <div class="logo-text">
+            <div style="font-weight:700; font-family: 'Playfair Display', serif;">Nehaa Gallerina</div>
+            <div style="font-size:12px;color:var(--text-secondary)">Natural & faceted gemstones</div>
+          </div>
+        </a>
       </div>
-      <nav>
+      <nav class="desktop-nav">
         <ul>
           <li><a href="{% url 'store:home' %}" class="magnetic">Home</a></li>
           <li><a href="{% url 'store:shop' %}" class="magnetic">Shop</a></li>
@@ -39,26 +68,29 @@
           {% endif %}
         </ul>
       </nav>
-      <div class="header-actions" style="display: flex; align-items: center; gap: 1rem; margin-left: auto;">
+      <div class="header-actions">
         {% if user.is_authenticated %}
-          <a href="{% url 'users:logout' %}" class="magnetic btn-logout" style="padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 6px; text-decoration: none; color: white; font-size: 14px; transition: all 0.3s;">
-            <i class="fas fa-sign-out-alt"></i> Logout
+          <a href="{% url 'users:logout' %}" class="magnetic btn-logout">
+            <i class="fas fa-sign-out-alt"></i> <span class="hide-mobile">Logout</span>
           </a>
         {% else %}
-          <a href="{% url 'users:login' %}" class="magnetic btn-login" style="padding: 8px 16px; background: var(--accent); border-radius: 6px; text-decoration: none; color: #000; font-weight: 600; font-size: 14px; transition: all 0.3s;">
-            <i class="fas fa-user"></i> Login
+          <a href="{% url 'users:login' %}" class="magnetic btn-login">
+            <i class="fas fa-user"></i> <span class="hide-mobile">Login</span>
           </a>
         {% endif %}
-        <a href="{% url 'store:cart' %}" class="magnetic cart-button" style="position: relative; padding: 8px 16px; background: rgba(255,255,255,0.1); border-radius: 6px; text-decoration: none; color: white; font-size: 18px; transition: all 0.3s;">
+        <a href="{% url 'store:cart' %}" class="magnetic cart-button" aria-label="Shopping Cart">
           <i class="fas fa-shopping-cart"></i>
-          <span id="django-cart-count" style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: {% if cart_count > 0 %}flex{% else %}none{% endif %}; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; font-family: Arial, sans-serif;">{{ cart_count }}</span>
+          <span id="django-cart-count" style="display: {% if cart_count > 0 %}flex{% else %}none{% endif %};">{{ cart_count }}</span>
         </a>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
       </div>
     </div>
   </header>
   
   {% if messages %}
-    <div class="messages-container">
+    <div class="messages-container container">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }}">
           {{ message }}
@@ -74,9 +106,31 @@
   </footer>
   
   <script>
-    const revealElements=document.querySelectorAll(".reveal"),observer=new IntersectionObserver(e=>{e.forEach(e=>{e.isIntersecting&&e.target.classList.add("active")})},{threshold:.1});revealElements.forEach(e=>observer.observe(e));const magneticElements=document.querySelectorAll(".magnetic"),strength=50;magneticElements.forEach(e=>{e.addEventListener("mousemove",t=>{const o=e.getBoundingClientRect(),s=t.clientX-o.left-o.width/2,i=t.clientY-o.top-o.height/2;e.style.transition="transform 0.1s ease",e.style.transform=`translate(${s/o.width*strength}px, ${i/o.height*strength}px)`}),e.addEventListener("mouseout",()=>{e.style.transition="transform 0.3s ease",e.style.transform="translate(0, 0)"})});const cursorDot=document.querySelector(".cursor-dot");window.addEventListener("mousemove",e=>{cursorDot.style.left=`${e.clientX}px`,cursorDot.style.top=`${e.clientY}px`});
+    const revealElements=document.querySelectorAll(".reveal"),observer=new IntersectionObserver(e=>{e.forEach(e=>{e.isIntersecting&&e.target.classList.add("active")})},{threshold:.1});revealElements.forEach(e=>observer.observe(e));const magneticElements=document.querySelectorAll(".magnetic"),strength=30;magneticElements.forEach(e=>{e.addEventListener("mousemove",t=>{if(window.innerWidth>880){const o=e.getBoundingClientRect(),s=t.clientX-o.left-o.width/2,i=t.clientY-o.top-o.height/2;e.style.transition="transform 0.1s ease",e.style.transform=`translate(${s/o.width*strength}px, ${i/o.height*strength}px)`}}),e.addEventListener("mouseout",()=>{e.style.transition="transform 0.3s ease",e.style.transform="translate(0, 0)"})});const cursorDot=document.querySelector(".cursor-dot");if(cursorDot){window.addEventListener("mousemove",e=>{if(window.innerWidth>880){cursorDot.style.left=`${e.clientX}px`,cursorDot.style.top=`${e.clientY}px`}})};
+    
+    // Mobile navigation logic
+    const toggleBtn = document.getElementById("mobileMenuToggle");
+    const closeBtn = document.getElementById("mobileNavClose");
+    const drawer = document.getElementById("mobileNavDrawer");
+    const overlay = document.getElementById("mobileNavOverlay");
+    
+    function openMobileNav() {
+      if(drawer) drawer.classList.add("active");
+      if(overlay) overlay.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+    
+    function closeMobileNav() {
+      if(drawer) drawer.classList.remove("active");
+      if(overlay) overlay.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+    
+    if (toggleBtn) toggleBtn.addEventListener("click", openMobileNav);
+    if (closeBtn) closeBtn.addEventListener("click", closeMobileNav);
+    if (overlay) overlay.addEventListener("click", closeMobileNav);
   </script>
-  <script src="{% static 'js/cart.js' %}?v=2"></script>
+  <script src="{% static 'js/cart.js' %}?v=3"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

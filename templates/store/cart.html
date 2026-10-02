@@ -154,6 +154,30 @@
     text-decoration: none;
     font-weight: 600;
   }
+  
+  @media (max-width: 600px) {
+    .cart-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.2rem 0;
+    }
+    .cart-item img {
+      width: 100%;
+      max-height: 180px;
+      margin-right: 0;
+      margin-bottom: 0.8rem;
+    }
+    .item-details {
+      width: 100%;
+    }
+    .item-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+  }
 </style>
 {% endblock %}
 
