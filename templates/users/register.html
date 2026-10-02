@@ -3,61 +3,173 @@
 
 {% block title %}Register — Nehaa Gallerina{% endblock %}
 
+{% block extra_css %}
+<style>
+  .register-section {
+    max-width: 520px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
+  
+  .register-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  
+  .register-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    color: #fff;
+  }
+  
+  .register-header p {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(224, 184, 255, 0.2);
+  }
+  
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .btn-register {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 700;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-register:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(224, 184, 255, 0.4);
+  }
+  
+  .login-prompt {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  
+  .login-prompt a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+  }
+  
+  .login-prompt a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 580px) {
+    .form-row-2 { grid-template-columns: 1fr; }
+    .register-card { padding: 1.5rem; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <main class="container">
-  <section class="login-section reveal" style="max-width: 500px; margin: 4rem auto;">
-    <div class="login-card" style="background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 8px;">
-      <div class="login-header">
-        <h1 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem; text-align: center;">Create Account</h1>
-        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Join us today</p>
+  <section class="register-section reveal">
+    <div class="register-card">
+      <div class="register-header">
+        <h1>Create an Account</h1>
+        <p>Join Nehaa Gallerina to explore natural gemstones</p>
       </div>
       
-      <form method="POST" class="login-form">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}" style="padding: 12px; border-radius: 8px; margin-bottom: 1.5rem; font-size: 14px; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      
+      <form method="POST" action="{% url 'users:register' %}" class="register-form">
         {% csrf_token %}
         
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-          <label for="username" style="display: block; margin-bottom: 0.5rem;">Username</label>
-          <input type="text" id="username" name="username" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        <div class="form-group">
+          <label for="username">Username *</label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="Choose a unique username" required autofocus>
         </div>
         
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-          <label for="email" style="display: block; margin-bottom: 0.5rem;">Email</label>
-          <input type="email" id="email" name="email" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="yourname@example.com" required>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-row-2">
           <div class="form-group">
-            <label for="first_name" style="display: block; margin-bottom: 0.5rem;">First Name</label>
-            <input type="text" id="first_name" name="first_name" 
-                   style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" class="form-control" placeholder="First Name">
           </div>
           
           <div class="form-group">
-            <label for="last_name" style="display: block; margin-bottom: 0.5rem;">Last Name</label>
-            <input type="text" id="last_name" name="last_name" 
-                   style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Last Name">
           </div>
         </div>
         
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-          <label for="password" style="display: block; margin-bottom: 0.5rem;">Password</label>
-          <input type="password" id="password" name="password" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" required>
         </div>
         
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-          <label for="password_confirm" style="display: block; margin-bottom: 0.5rem;">Confirm Password</label>
-          <input type="password" id="password_confirm" name="password_confirm" required 
-                 style="width: 100%; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff;">
+        <div class="form-group">
+          <label for="password_confirm">Confirm Password *</label>
+          <input type="password" id="password_confirm" name="password_confirm" class="form-control" placeholder="Re-enter password" required>
         </div>
         
-        <button type="submit" class="btn magnetic" style="width: 100%; padding: 12px; font-size: 16px;">Register</button>
+        <button type="submit" class="btn-register">Create Account</button>
       </form>
       
-      <div style="margin-top: 2rem; text-align: center;">
-        <p>Already have an account? <a href="{% url 'users:login' %}" style="color: var(--accent);">Login here</a></p>
+      <div class="login-prompt">
+        <p>Already have an account? <a href="{% url 'users:login' %}">Login here</a></p>
       </div>
     </div>
   </section>

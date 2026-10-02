@@ -9,10 +9,9 @@ from store.models import Order
 
 def login_view(request):
     """
-    User login view.
+    User login view with role auto-detection.
     """
     if request.user.is_authenticated:
-        # Redirect based on user role
         if request.user.is_staff:
             return redirect('dashboard:admin_dashboard')
         return redirect('users:user_home')
@@ -20,23 +19,20 @@ def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        role = request.POST.get('role')
+        role = request.POST.get('role', '')
         
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            # Check role
+            # Check role if specifically requested
             if role == 'admin' and not user.is_staff:
                 messages.error(request, 'Invalid credentials for admin access')
                 return render(request, 'users/login.html')
             
-            if role == 'user' and user.is_staff:
-                messages.error(request, 'Please login as admin')
-                return render(request, 'users/login.html')
-            
             login(request, user)
+            messages.success(request, f'Welcome back, {user.username}!')
             
-            # Redirect based on role
+            # Redirect based on staff status
             if user.is_staff:
                 return redirect('dashboard:admin_dashboard')
             return redirect('users:user_home')
@@ -48,43 +44,57 @@ def login_view(request):
 
 def register_view(request):
     """
-    User registration view.
+    User registration view - creates user in database and logs them in.
     """
     if request.user.is_authenticated:
         return redirect('users:user_home')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        first_name = request.POST.get('first_name', '')
-        last_name = request.POST.get('last_name', '')
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        password_confirm = request.POST.get('password_confirm', '')
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
         
         # Validation
+        if not username or not email or not password:
+            messages.error(request, 'Please fill in all required fields.')
+            return render(request, 'users/register.html')
+        
         if password != password_confirm:
-            messages.error(request, 'Passwords do not match')
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'users/register.html')
+        
+        if len(password) < 6:
+            messages.error(request, 'Password must be at least 6 characters long.')
             return render(request, 'users/register.html')
         
         if CustomUser.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
+            messages.error(request, 'Username is already taken.')
             return render(request, 'users/register.html')
         
         if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, 'Email already registered')
+            messages.error(request, 'Email address is already registered.')
             return render(request, 'users/register.html')
         
-        # Create user
-        user = CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name
-        )
-        
-        messages.success(request, 'Account created successfully! Please login.')
-        return redirect('users:login')
+        # Create user in database
+        try:
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name
+            )
+            
+            # Log in the user automatically
+            login(request, user)
+            messages.success(request, f'Account created successfully! Welcome to Nehaa Gallerina, {user.username}!')
+            return redirect('users:user_home')
+        except Exception as e:
+            messages.error(request, f'Error creating account: {str(e)}')
+            return render(request, 'users/register.html')
     
     return render(request, 'users/register.html')
 

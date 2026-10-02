@@ -24,7 +24,10 @@
       {% endif %}
       
       {% if product.is_in_stock %}
-        <button class="btn magnetic add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+        <form id="addToCartForm" style="display:inline;">
+          {% csrf_token %}
+          <button class="btn magnetic add-to-cart-btn" data-product-id="{{ product.id }}">Add to Cart</button>
+        </form>
         <p class="stock-info">In Stock: {{ product.stock }} available</p>
       {% else %}
         <button class="btn" disabled>Out of Stock</button>
@@ -62,23 +65,24 @@
 
 {% block extra_js %}
 <script>
-// Get CSRF token from cookie
-function getCookie(name) {
+// Get CSRF token helper
+function getCsrfToken() {
+  const input = document.querySelector('[name=csrfmiddlewaretoken]');
+  if (input) return input.value;
+  
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
     const cookies = document.cookie.split(';');
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+      if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken=')) {
+        cookieValue = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
         break;
       }
     }
   }
   return cookieValue;
 }
-
-const csrftoken = getCookie('csrftoken');
 
 document.addEventListener('DOMContentLoaded', function() {
   const addToCartBtn = document.querySelector('.add-to-cart-btn');
@@ -98,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
       fetch(`/api/cart/add/${productId}/`, {
         method: 'POST',
         headers: {
-          'X-CSRFToken': csrftoken,
+          'X-CSRFToken': getCsrfToken(),
         },
         body: formData
       })

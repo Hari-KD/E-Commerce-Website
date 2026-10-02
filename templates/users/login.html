@@ -165,19 +165,21 @@
         </div>
         
         <div class="form-group">
-          <label for="role">Login as</label>
-          <select id="role" name="role" class="form-control" required>
-            <option value="">Select Role</option>
+          <label for="role">Login as (Optional)</label>
+          <select id="role" name="role" class="form-control">
+            <option value="user" selected>User</option>
             <option value="admin">Admin</option>
-            <option value="user">User</option>
           </select>
         </div>
         
         <button type="submit" class="btn-login">Login</button>
       </form>
       
-      <div class="register-link">
-        <p>Don't have an account? <a href="{% url 'users:register' %}">Register here</a></p>
+      <div class="register-link" style="margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="margin-bottom: 0.75rem; color: var(--text-secondary);">Don't have an account yet?</p>
+        <a href="{% url 'users:register' %}" style="display: inline-block; padding: 10px 20px; background: rgba(224, 184, 255, 0.15); color: var(--accent); border: 1px solid var(--accent); border-radius: 50px; text-decoration: none; font-weight: 700; transition: all 0.3s ease;">
+          Create New Account
+        </a>
       </div>
       
       <div class="login-footer">
