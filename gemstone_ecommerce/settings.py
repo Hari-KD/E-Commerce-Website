@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-production-ready-key-change-in-env')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Host & Origin Configuration
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app,localhost,127.0.0.1,*', cast=Csv())
@@ -69,18 +69,25 @@ WSGI_APPLICATION = 'gemstone_ecommerce.wsgi.application'
 
 # Database Configuration (Serverless Writable Fallback for Vercel)
 db_name = config('DB_NAME', default='db.sqlite3')
-db_path = BASE_DIR / db_name
+local_db_path = BASE_DIR / db_name
 
 IS_VERCEL = os.environ.get('VERCEL', '0') == '1' or os.environ.get('NOW_REGION') is not None
 if IS_VERCEL or not os.access(BASE_DIR, os.W_OK):
     tmp_db_path = Path('/tmp') / db_name
-    if not tmp_db_path.exists() and db_path.exists():
-        try:
-            shutil.copy2(db_path, tmp_db_path)
-        except Exception:
-            pass
-    if tmp_db_path.exists():
-        db_path = tmp_db_path
+    if not tmp_db_path.exists():
+        if local_db_path.exists():
+            try:
+                shutil.copy2(local_db_path, tmp_db_path)
+            except Exception:
+                pass
+        else:
+            try:
+                tmp_db_path.touch(exist_ok=True)
+            except Exception:
+                pass
+    db_path = tmp_db_path
+else:
+    db_path = local_db_path
 
 DATABASES = {
     'default': {
