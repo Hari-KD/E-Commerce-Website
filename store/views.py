@@ -20,12 +20,15 @@ def _get_cart_id(request):
 
 def home(request):
     """
-    Home page view - displays featured products.
+    Home page view - displays featured products with fallback to any available products.
     """
     featured_products = Product.objects.filter(
         is_featured=True, 
         is_available=True
     )[:4]
+    
+    if not featured_products.exists():
+        featured_products = Product.objects.filter(is_available=True)[:4]
     
     context = {
         'featured_products': featured_products,
