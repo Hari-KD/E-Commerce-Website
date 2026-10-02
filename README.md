@@ -45,16 +45,10 @@ pip install -r requirements.txt
 
 ### 2. Environment Setup
 
-Create a `.env` file in the project root (reference `.env.example`):
+Copy `.env.example` to create a `.env` file in the project root and configure your environment variables:
 
-```env
-SECRET_KEY=your-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=your_domain.com,127.0.0.1
-
-# Razorpay Settings
-RAZORPAY_KEY_ID=YOUR_RAZORPAY_KEY_ID
-RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
+```bash
+cp .env.example .env
 ```
 
 ### 3. Database Setup
@@ -228,13 +222,9 @@ All static HTML files have been converted to Django templates.
 
 ### Razorpay Setup
 
-1. Sign up on the payment provider dashboard
-2. Obtain API keys
-3. Update `.env` file:
-   ```env
-   RAZORPAY_KEY_ID=YOUR_RAZORPAY_KEY_ID
-   RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
-   ```
+1. Sign up on the Razorpay dashboard.
+2. Obtain API keys for integration.
+3. Configure `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in your `.env` file.
 
 ## Database Models
 
