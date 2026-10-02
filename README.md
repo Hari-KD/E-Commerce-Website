@@ -1,15 +1,15 @@
-# Nehaa Gallerina - Django E-commerce Backend
+# Nehaa Gallerina - Django E-Commerce Backend
 
 A complete Django backend for the Nehaa Gallerina gemstone e-commerce website. This project converts the static HTML/CSS/JS frontend into a fully dynamic, database-driven application.
 
-## 🎯 Features
+## Features
 
 ### Core Functionality
-- **Dynamic Product Management**: All 20+ static product pages consolidated into a single dynamic template
-- **User Authentication**: Login, registration, and role-based access (Admin/User)
-- **Shopping Cart**: Session-based cart for guests, database cart for authenticated users
-- **Checkout & Orders**: Complete order processing with Razorpay payment integration
-- **Admin Dashboard**: Comprehensive analytics and management interface
+- **Dynamic Product Management**: All product pages consolidated into dynamic templates
+- **User Authentication**: Login, registration, and role-based access control
+- **Shopping Cart**: Session-based cart for guests and database cart for authenticated users
+- **Checkout & Orders**: Order processing with payment integration
+- **Admin Dashboard**: Analytics and management interface
 - **RESTful API**: JSON endpoints for cart operations
 
 ### Apps Structure
@@ -17,15 +17,15 @@ A complete Django backend for the Nehaa Gallerina gemstone e-commerce website. T
 - **users**: Custom user model, authentication, and profiles
 - **dashboard**: Admin analytics and management views
 
-## 📋 Requirements
+## Requirements
 
 - Python 3.8+
 - Django 4.2.7
 - SQLite (default) or PostgreSQL/MySQL
 - Pillow for image handling
-- See `requirements.txt` for complete list
+- Refer to `requirements.txt` for the complete list of dependencies
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -45,16 +45,16 @@ pip install -r requirements.txt
 
 ### 2. Environment Setup
 
-Create a `.env` file in the project root (copy from `.env.example`):
+Create a `.env` file in the project root (reference `.env.example`):
 
 ```env
 SECRET_KEY=your-secret-key-here
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=your_domain.com,127.0.0.1
 
 # Razorpay Settings
-RAZORPAY_KEY_ID=rzp_test_your_key_id
-RAZORPAY_KEY_SECRET=your_key_secret
+RAZORPAY_KEY_ID=YOUR_RAZORPAY_KEY_ID
+RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
 ```
 
 ### 3. Database Setup
@@ -64,7 +64,7 @@ RAZORPAY_KEY_SECRET=your_key_secret
 python manage.py makemigrations
 python manage.py migrate
 
-# Create test users (admin and regular user)
+# Create initial test users
 python manage.py create_test_users
 
 # Load sample products
@@ -90,21 +90,9 @@ python manage.py collectstatic --noinput
 python manage.py runserver
 ```
 
-Visit `http://127.0.0.1:8000/` in your browser.
+Open your browser and navigate to your local server port (default: port 8000).
 
-## 👤 Test Credentials
-
-### Admin Access
-- **Username**: admin
-- **Password**: admin123
-- **URL**: http://127.0.0.1:8000/accounts/login/ (select "Admin" role)
-
-### Regular User
-- **Username**: user
-- **Password**: user123
-- **URL**: http://127.0.0.1:8000/accounts/login/ (select "User" role)
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 gemstone_ecommerce/
@@ -154,28 +142,24 @@ gemstone_ecommerce/
 └── README.md
 ```
 
-## 🔑 Key Features Explained
+## Key Features Explained
 
 ### 1. Dynamic Product Pages
-All 20+ static product HTML files have been replaced with a single dynamic template (`product_detail.html`) that fetches product data from the database using slugs.
+All static product HTML files have been replaced with dynamic templates (`product_detail.html`) that fetch product data from the database using slugs.
 
 **URL Pattern**: `/product/<slug>/`
 
-Example:
-- Old: `product1-citrine.html`
-- New: `/product/citrine-faceted/`
-
 ### 2. Shopping Cart System
 
-#### For Guest Users:
+#### Guest Users:
 - Cart stored in session
 - Cart ID generated automatically
 - Persists across page reloads
 
-#### For Authenticated Users:
+#### Authenticated Users:
 - Cart stored in database
 - Linked to user account
-- Accessible from any device
+- Accessible across sessions
 
 #### API Endpoints:
 - `POST /api/cart/add/<product_id>/` - Add item to cart
@@ -188,7 +172,7 @@ Example:
 1. User adds items to cart
 2. Proceeds to checkout
 3. Fills shipping information
-4. Completes payment via Razorpay
+4. Completes payment via payment gateway
 5. Order created in database
 6. Stock updated automatically
 7. Loyalty points awarded
@@ -199,9 +183,8 @@ Access at: `/dashboard/`
 
 Features:
 - Total orders, sales, and revenue statistics
-- Sales and revenue charts (Chart.js)
+- Sales and revenue charts
 - Recent orders table
-- Growth percentages
 - Monthly target tracking
 
 ### 5. User Profiles
@@ -212,35 +195,26 @@ Users can:
 - Update profile information
 - View account statistics
 
-## 🛠️ Management Commands
+## Management Commands
 
-### Create Test Users
+### Create Initial Users
 ```bash
 python manage.py create_test_users
 ```
-Creates:
-- Admin user (admin/admin123)
-- Regular user (user/user123)
 
 ### Load Sample Products
 ```bash
 python manage.py load_products
 ```
-Loads all 20 products from the static HTML files into the database with:
-- Product details
-- Images (URLs)
-- Pricing
-- Stock levels
-- Categories
 
 ### Create Superuser (Alternative)
 ```bash
 python manage.py createsuperuser
 ```
 
-## 🎨 Template Conversion
+## Template Conversion
 
-All static HTML files have been converted to Django templates with:
+All static HTML files have been converted to Django templates.
 
 ### Django Template Language (DTL) Features:
 - `{% extends 'base.html' %}` - Template inheritance
@@ -250,38 +224,19 @@ All static HTML files have been converted to Django templates with:
 - `{{ product.name }}` - Variable output
 - `{% load static %}` - Static file loading
 
-### Example Conversion:
-
-**Before (Static HTML):**
-```html
-<a href="product1-citrine.html">AAA+ Citrine</a>
-```
-
-**After (Django Template):**
-```html
-<a href="{% url 'store:product_detail' product.slug %}">{{ product.name }}</a>
-```
-
-## 💳 Payment Integration
+## Payment Integration
 
 ### Razorpay Setup
 
-1. Sign up at [https://razorpay.com](https://razorpay.com)
-2. Get API keys from dashboard
+1. Sign up on the payment provider dashboard
+2. Obtain API keys
 3. Update `.env` file:
    ```env
-   RAZORPAY_KEY_ID=rzp_live_your_key
-   RAZORPAY_KEY_SECRET=your_secret
+   RAZORPAY_KEY_ID=YOUR_RAZORPAY_KEY_ID
+   RAZORPAY_KEY_SECRET=YOUR_RAZORPAY_KEY_SECRET
    ```
-4. Update `checkout.html` with your key
 
-### Test Mode
-Currently configured for test mode. Use test card:
-- **Card**: 4111 1111 1111 1111
-- **CVV**: Any 3 digits
-- **Expiry**: Any future date
-
-## 📊 Database Models
+## Database Models
 
 ### Product Model
 - name, slug, description, price
@@ -301,7 +256,7 @@ Currently configured for test mode. Use test card:
 - Additional fields: phone_number, address, loyalty_points
 - Methods: get_total_orders(), get_total_spent()
 
-## 🔐 Security Notes
+## Security Notes
 
 - CSRF protection enabled
 - Password hashing (Django default)
@@ -310,17 +265,16 @@ Currently configured for test mode. Use test card:
 - XSS protection (template escaping)
 
 **Production Checklist:**
-- [ ] Set `DEBUG=False`
-- [ ] Use strong `SECRET_KEY`
-- [ ] Configure HTTPS
-- [ ] Use environment variables
-- [ ] Set up proper database (PostgreSQL)
-- [ ] Configure email backend
-- [ ] Set up proper media storage (S3)
-- [ ] Implement rate limiting
-- [ ] Add logging
+- Set `DEBUG=False`
+- Use strong `SECRET_KEY` from environment variables
+- Configure HTTPS
+- Use environment variables for all secrets
+- Set up production database (e.g., PostgreSQL)
+- Configure email backend
+- Set up secure media storage
+- Implement rate limiting and logging
 
-## 🚢 Deployment
+## Deployment
 
 ### Prepare for Production
 
@@ -330,32 +284,20 @@ DEBUG = False
 ALLOWED_HOSTS = ['yourdomain.com']
 ```
 
-2. Use PostgreSQL:
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_db_name',
-        'USER': 'your_db_user',
-        'PASSWORD': 'your_db_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
+2. Configure database settings via environment variables.
 
 3. Collect static files:
 ```bash
 python manage.py collectstatic
 ```
 
-4. Use a production server (Gunicorn):
+4. Use a production WSGI server (e.g., Gunicorn):
 ```bash
 pip install gunicorn
 gunicorn gemstone_ecommerce.wsgi:application
 ```
 
-## 📝 API Documentation
+## API Documentation
 
 ### Cart API
 
@@ -400,7 +342,7 @@ Response: {
 }
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Issue: Static files not loading
 ```bash
@@ -413,7 +355,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### Issue: Admin can't login
+### Issue: Admin cannot login
 ```bash
 python manage.py createsuperuser
 ```
@@ -423,32 +365,9 @@ python manage.py createsuperuser
 python manage.py load_products
 ```
 
-## 📚 Additional Resources
+## License
 
-- [Django Documentation](https://docs.djangoproject.com/)
-- [Django REST Framework](https://www.django-rest-framework.org/)
-- [Razorpay Documentation](https://razorpay.com/docs/)
-
-## 🤝 Contributing
-
-This is a complete backend implementation for the Nehaa Gallerina e-commerce site. Feel free to extend it with additional features.
-
-## 📄 License
-
-This project is for educational purposes.
-
-## ✨ Features to Add (Future)
-
-- [ ] Product reviews and ratings
-- [ ] Wishlist functionality
-- [ ] Email notifications
-- [ ] Invoice generation (PDF)
-- [ ] Inventory alerts
-- [ ] Coupon/discount system
-- [ ] Multi-currency support
-- [ ] Advanced search and filters
-- [ ] Product recommendations
-- [ ] Social media integration
+This project is for educational and portfolio purposes.
 
 ---
 
